@@ -23,7 +23,6 @@ get '/' do
 end
 
 post '/ephemeral_keys' do
-  authenticate!
   begin
     key = Stripe::EphemeralKey.create(
       {customer: @customer.id},
@@ -336,7 +335,7 @@ post '/create_new_customer' do
     created_customer = Stripe::Customer.create({
       name: payload[:name],
       email: payload[:email],
-      description: payload[:identifier] != nil,
+      id: payload[:identifier] != nil,
     })
   rescue Stripe::StripeError => e
     status 402
