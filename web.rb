@@ -23,7 +23,6 @@ get '/' do
 end
 
 post '/ephemeral_keys' do
-  authenticate!
   begin
     key = Stripe::EphemeralKey.create(
       {customer: @customer.id},
@@ -253,7 +252,6 @@ end
 # https://stripe.com/docs/api/payment_intents/confirm
 # A real implementation would include controls to prevent misuse
 post '/confirm_payment_intent' do
-  authenticate!
   payload = params
   if request.content_type.include? 'application/json' and params.empty?
     payload = Sinatra::IndifferentHash[JSON.parse(request.body.read)]
