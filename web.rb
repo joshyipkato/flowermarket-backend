@@ -209,7 +209,6 @@ end
 # https://stripe.com/docs/api/payment_intents/create
 # A real implementation would include controls to prevent misuse
 post '/create_payment_intent' do
-  authenticate!
   payload = params
 
   if request.content_type != nil and request.content_type.include? 'application/json' and params.empty?
@@ -326,6 +325,56 @@ def generate_payment_response(payment_intent)
   end
 end
 
+# ===== Custom Methods
+# Create new customer at login
+
+post '/create_new_customer' do
+  payload = params
+  if request.content_type != nil and request.content_type.include? 'application/json' and params.empty?
+      payload = Sinatra::IndifferentHash[JSON.parse(request.body.read)]
+  end
+  begin
+    created_customer = Stripe::Customer.create({
+      name: payload[:name],
+      email: payload[:email],
+      description: payload[:identifier] != nil,
+    })
+  rescue Stripe::StripeError => e
+    status 402
+    return log_info("Error creating SetupIntent: #{e.message}")
+  end
+
+  status 200
+  return log_info("Customer successfully created: #{created_customer.id}")
+  
+end
+
+post '/authenticate_stripe_user' do
+  
+  return @customer if @customer
+  
+  payload = params
+  if request.content_type != nil and request.content_type.include? 'application/json' and params.empty?
+      payload = Sinatra::IndifferentHash[JSON.parse(request.body.read)]
+  end
+  
+  if session.has_key?(:customer_id)
+    customer_id = session[:customer_id]
+    begin
+      @customer = Stripe::Customer.retrieve(customer_id)
+    rescue Stripe::InvalidRequestError
+    end
+  else
+    @customer = Stripe::Customer.retrieve(payload[:customer_id])
+    session[:customer_id] = @customer.id
+  end
+  @customer
+  
+  status 200
+  return log_info("Customer successfully authenticated")
+  
+end
+
 # ===== Helpers
 
 # Our example apps sell emoji apparel; this hash lets us calculate the total amount to charge.
@@ -356,6 +405,8 @@ def calculate_price(products, shipping)
       amount = amount + 2099
     when "ups_worldwide"
       amount = amount + 1099
+    when "free"
+      amount = amount + 0
     end
   end
 
@@ -368,21 +419,21 @@ def currency_for_country(country)
 
   case country
   when 'us'
-    'usd'
+    'hkd'
   when 'mx'
-    'mxn'
+    'hkd'
   when 'my'
-    'myr'
+    'hkd'
   when 'at', 'be', 'de', 'es', 'it', 'nl', 'pl'
-    'eur'
+    'hkd'
   when 'au'
-    'aud'
+    'hkd'
   when 'gb'
-    'gbp'
+    'hkd'
     when 'hk'
       'hkd'
   else
-    'usd'
+    'hkd'
   end
 end
 
