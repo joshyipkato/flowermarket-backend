@@ -344,13 +344,23 @@ post '/create_new_customer' do
       email: payload[:email],
       id: payload[:identifier] != nil,
     })
+
+        if (Stripe.api_key.start_with?('sk_test_'))
+          # only attach test cards in testmode
+          attach_customer_test_cards()
+        end
+    
   rescue Stripe::StripeError => e
     status 402
     return log_info("Error creating SetupIntent: #{e.message}")
   end
+  
+  
 
   status 200
   return log_info("Customer successfully created: #{created_customer.id}")
+  
+  
   
 end
 
