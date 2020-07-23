@@ -339,7 +339,7 @@ post '/create_new_customer' do
       payload = Sinatra::IndifferentHash[JSON.parse(request.body.read)]
   end
   begin
-    created_customer = Stripe::Customer.create({
+      Stripe::Customer.create({
       name: payload[:name],
       email: payload[:email],
       id: payload[:identifier] != nil,
@@ -358,7 +358,7 @@ post '/create_new_customer' do
   
 
   status 200
-  return log_info("Customer successfully created: #{created_customer.id}")
+  return log_info("Customer successfully created")
   
   
   
