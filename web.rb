@@ -342,7 +342,6 @@ post '/create_new_customer' do
       Stripe::Customer.create({
       name: payload[:name],
       email: payload[:email],
-      id: payload[:identifier] != nil,
     })
 
         #if (Stripe.api_key.start_with?('sk_test_'))
