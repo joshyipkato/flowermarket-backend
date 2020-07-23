@@ -340,7 +340,7 @@ post '/create_new_customer' do
   end
   begin
       Stripe::Customer.create({
-      name: payload[:name],
+      description: payload[:fbuid],
       email: payload[:email],
     })
 
@@ -379,7 +379,7 @@ post '/authenticate_stripe_user' do
     rescue Stripe::InvalidRequestError
     end
   else
-    @customer = Stripe::Customer.retrieve(payload[:customer_id])
+    @customer = Stripe::Customer.retrieve(payload[:fbuid])
     session[:customer_id] = @customer.id
   end
   @customer
