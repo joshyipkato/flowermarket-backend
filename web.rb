@@ -23,17 +23,12 @@ get '/' do
 end
 
 post '/ephemeral_keys' do
-  #authenticate!
-  
-    payload = params
-  if request.content_type != nil and request.content_type.include? 'application/json' and params.empty?
-      payload = Sinatra::IndifferentHash[JSON.parse(request.body.read)]
-  end
+  authenticate!
   
   begin
     key = Stripe::EphemeralKey.create(
-      {customer: payload[:customer_id]},
-      {stripe_version: payload[:api_version]}
+      {customer: @customer.id},
+      {stripe_version: params["api_version"]}
     )
   rescue Stripe::StripeError => e
     status 402
@@ -343,6 +338,8 @@ post '/create_new_customer' do
       description: payload[:fbuid],
       email: payload[:email],
     })
+    
+    session[:customer_id] = @customer.id
 
         if (Stripe.api_key.start_with?('sk_test_'))
           # only attach test cards in testmode
