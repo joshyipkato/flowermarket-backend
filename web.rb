@@ -326,7 +326,6 @@ def generate_payment_response(payment_intent)
   else
     # Invalid status
     status 500
-    return "Invalid PaymentIntent Status"
   end
 end
 
