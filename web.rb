@@ -25,15 +25,15 @@ end
 post '/ephemeral_keys' do
   #authenticate!
   
-  begin
-    @customer = Stripe::Customer.retrieve(customer_id)
-    rescue Stripe::InvalidRequestError
+    payload = params
+  if request.content_type != nil and request.content_type.include? 'application/json' and params.empty?
+      payload = Sinatra::IndifferentHash[JSON.parse(request.body.read)]
   end
   
   begin
     key = Stripe::EphemeralKey.create(
-      {customer: params["customer_id"]},
-      {stripe_version: params["api_version"]}
+      {customer: payload[:customer_id]},
+      {stripe_version: payload[:api_version]}
     )
   rescue Stripe::StripeError => e
     status 402
