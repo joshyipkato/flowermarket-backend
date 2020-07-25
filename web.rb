@@ -326,13 +326,9 @@ def generate_payment_response(payment_intent)
   else
     # Invalid status
     status 500
-    return "Invalid PaymentIntent status"
+    return "Invalid PaymentIntent Status"
   end
 end
-
-
-
-
 
 
 post '/create_new_customer' do
