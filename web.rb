@@ -23,16 +23,16 @@ get '/' do
 end
 
 post '/ephemeral_keys' do
-  #authenticate!
+  # authenticate!
   
-  begin
-    @customer = Stripe::Customer.retrieve(customer_id)
-    rescue Stripe::InvalidRequestError
-  end
+  # begin
+  #  @customer = Stripe::Customer.retrieve(customer_id)
+  #  rescue Stripe::InvalidRequestError
+  # end
   
   begin
     key = Stripe::EphemeralKey.create(
-      {customer: @customer.id},
+      {customer: params["customer_id"],
       {stripe_version: params["api_version"]}
     )
   rescue Stripe::StripeError => e
