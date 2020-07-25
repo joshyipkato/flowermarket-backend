@@ -371,7 +371,7 @@ post '/authenticate_stripe_user' do
     rescue Stripe::InvalidRequestError
     end
   else
-    @customer = Stripe::Customer.retrieve(payload[:fbuid])
+    @customer = Stripe::Customer.retrieve(payload[:stripeID])
     session[:customer_id] = @customer.id
   end
   
