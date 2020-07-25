@@ -23,16 +23,16 @@ get '/' do
 end
 
 post '/ephemeral_keys' do
-  # authenticate!
+  #authenticate!
   
   begin
-   @customer = Stripe::Customer.retrieve(customer_id)
-   rescue Stripe::InvalidRequestError
+    @customer = Stripe::Customer.retrieve(customer_id)
+    rescue Stripe::InvalidRequestError
   end
   
   begin
     key = Stripe::EphemeralKey.create(
-      {customer: params["customer_id"],
+      {customer: @customer.id},
       {stripe_version: params["api_version"]}
     )
   rescue Stripe::StripeError => e
@@ -326,18 +326,18 @@ def generate_payment_response(payment_intent)
   else
     # Invalid status
     status 500
+    return "Invalid PaymentIntent status"
   end
 end
 
+# ===== Custom Methods
+# Create new customer at login
 
 post '/create_new_customer' do
-  
-  
   payload = params
   if request.content_type != nil and request.content_type.include? 'application/json' and params.empty?
       payload = Sinatra::IndifferentHash[JSON.parse(request.body.read)]
   end
-  
   begin
       @customer = Stripe::Customer.create({
       description: payload[:fbuid],
@@ -350,16 +350,15 @@ post '/create_new_customer' do
         end
     
   rescue Stripe::StripeError => e
-     status 402
+    status 402
     return log_info("Error creating SetupIntent: #{e.message}")
   end
+  
   
   content_type :json
   status 200
   @customer.to_json
 end
-
-
 
 post '/authenticate_stripe_user' do
   
@@ -377,7 +376,7 @@ post '/authenticate_stripe_user' do
     rescue Stripe::InvalidRequestError
     end
   else
-    @customer = Stripe::Customer.retrieve(payload[:stripeID])
+    @customer = Stripe::Customer.retrieve(payload[:fbuid])
     session[:customer_id] = @customer.id
   end
   @customer
