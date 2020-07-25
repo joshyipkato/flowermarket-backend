@@ -359,8 +359,6 @@ end
 
 post '/authenticate_stripe_user' do
   
-  return @customer if @customer
-  
   payload = params
   if request.content_type != nil and request.content_type.include? 'application/json' and params.empty?
       payload = Sinatra::IndifferentHash[JSON.parse(request.body.read)]
@@ -376,7 +374,6 @@ post '/authenticate_stripe_user' do
     @customer = Stripe::Customer.retrieve(payload[:fbuid])
     session[:customer_id] = @customer.id
   end
-  @customer
   
   content_type :json
   status 200
