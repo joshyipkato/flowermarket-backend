@@ -25,10 +25,10 @@ end
 post '/ephemeral_keys' do
   # authenticate!
   
-  # begin
-  #  @customer = Stripe::Customer.retrieve(customer_id)
-  #  rescue Stripe::InvalidRequestError
-  # end
+  begin
+   @customer = Stripe::Customer.retrieve(customer_id)
+   rescue Stripe::InvalidRequestError
+  end
   
   begin
     key = Stripe::EphemeralKey.create(
@@ -334,10 +334,13 @@ end
 # Create new customer at login
 
 post '/create_new_customer' do
+  
+  
   payload = params
   if request.content_type != nil and request.content_type.include? 'application/json' and params.empty?
       payload = Sinatra::IndifferentHash[JSON.parse(request.body.read)]
   end
+  
   begin
       @customer = Stripe::Customer.create({
       description: payload[:fbuid],
@@ -350,10 +353,9 @@ post '/create_new_customer' do
         end
     
   rescue Stripe::StripeError => e
-    status 402
+     status 402
     return log_info("Error creating SetupIntent: #{e.message}")
   end
-  
   
   content_type :json
   status 200
