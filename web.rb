@@ -344,10 +344,10 @@ post '/create_new_customer' do
       email: payload[:email],
     })
 
-        #if (Stripe.api_key.start_with?('sk_test_'))
+        if (Stripe.api_key.start_with?('sk_test_'))
           # only attach test cards in testmode
-        #  attach_customer_test_cards()
-        #end
+          attach_customer_test_cards()
+        end
     
   rescue Stripe::StripeError => e
     status 402
