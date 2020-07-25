@@ -330,8 +330,10 @@ def generate_payment_response(payment_intent)
   end
 end
 
-# ===== Custom Methods
-# Create new customer at login
+
+
+
+
 
 post '/create_new_customer' do
   
@@ -361,6 +363,8 @@ post '/create_new_customer' do
   status 200
   @customer.to_json
 end
+
+
 
 post '/authenticate_stripe_user' do
   
