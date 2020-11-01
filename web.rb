@@ -153,6 +153,9 @@ post '/stripe-webhook' do
   when 'payment_intent.succeeded'
     payment_intent = event.data.object # contains a Stripe::PaymentIntent
     log_info("Webhook: PaymentIntent succeeded #{payment_intent.id}")
+    
+    
+    
     # Fulfill the customer's purchase, send an email, etc.
     # When creating the PaymentIntent, consider storing any order
     # information (e.g. order number) as metadata so that you can retrieve it
@@ -227,6 +230,10 @@ post '/create_payment_intent' do
       :description => "Example PaymentIntent",
       :capture_method => ENV['CAPTURE_METHOD'] == "manual" ? "manual" : "automatic",
       payment_method_types: payment_methods_for_country(payload[:country]),
+      
+      # Sends receipt
+      receipt_email: payload[:email_address],
+      
       :metadata => {
         :order_id => '5278735C-1F40-407D-933A-286E463E72D8',
       }.merge(payload[:metadata] || {}),
